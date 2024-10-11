@@ -7,16 +7,24 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import java.security.SecurityPermission;
 
 public class ContainerDolarLayout extends Fragment {
 
     private int widthFrag;
     private int heightFrag;
+    private String[] arraySpinner = {"Opción 1", "Opción 2", "Opción 3"};
 
     public ContainerDolarLayout() {
         //vacio paso parametros por bundle
     }
+
 
     //para setear nuevas instancias y pasarlas por bundle..
     public static ContainerDolarLayout newInstance(int width, int height) {
@@ -50,6 +58,32 @@ public class ContainerDolarLayout extends Fragment {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(widthFrag, heightFrag);
         frameLayout.setLayoutParams(params);
 
+        Spinner spinner = view.findViewById(R.id.spinner_options);
+        // Crear un ArrayAdapter usando el layout simple_spinner_item y la lista de opciones
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, arraySpinner);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Aplicar el adaptador al spinner
+        spinner.setAdapter(adapter);
+
+        // Configurar un Listener para el evento de selección
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                /*String selectedOption = arraySpinner[position];
+                Toast.makeText(getContext(), "Seleccionaste: " + selectedOption, Toast.LENGTH_SHORT).show();
+            */
+            }
+
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No se seleccionó nada
+            }
+        });
+
         return view;
     }
+
 }
