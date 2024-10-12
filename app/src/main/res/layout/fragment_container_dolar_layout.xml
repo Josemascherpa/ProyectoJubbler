@@ -5,9 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/rounded_background"
-    tools:context=".ContainerDolarLayout">
+    tools:context=".ui.fragments.ContainerDolarLayout">
 
     <TextView
+        android:id="@+id/date_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nombre Dolar"
@@ -52,6 +53,7 @@
             >
 
             <TextView
+                android:id="@+id/dale_buy"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:textColor="#fbffff"
@@ -59,6 +61,7 @@
                 android:text="Compra"
                 android:gravity="start" />
             <TextView
+                android:id="@+id/date_sell"
                 android:layout_width="0dp"
                 android:textColor="#fbffff"
                 android:layout_height="wrap_content"
@@ -69,9 +72,10 @@
         <Spinner
             android:id="@+id/spinner_options"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:background="@color/white"
             android:layout_gravity="center"
-            android:paddingTop="5dp"/>
+            android:textAlignment="center"
+            android:paddingTop="3dp"/>
     </LinearLayout>
 </FrameLayout>
