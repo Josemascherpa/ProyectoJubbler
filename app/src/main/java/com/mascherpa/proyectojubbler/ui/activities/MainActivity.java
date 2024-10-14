@@ -14,7 +14,7 @@ import com.mascherpa.proyectojubbler.data.ApiService;
 import com.mascherpa.proyectojubbler.data.RetrofitClient;
 import com.mascherpa.proyectojubbler.database.DolarDatabase;
 import com.mascherpa.proyectojubbler.model.Dolar;
-import com.mascherpa.proyectojubbler.ui.fragments.ContainerDolarLayout;
+import com.mascherpa.proyectojubbler.ui.fragments.ContainerDolarFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    List<ContainerDolarLayout> listFragments = new ArrayList<ContainerDolarLayout>();
+    List<ContainerDolarFragment> listFragments = new ArrayList<ContainerDolarFragment>();
     int amountDolar = 0;
     List<Dolar> dolars = new ArrayList<Dolar>();
     DolarDatabase dolarDB;
@@ -41,18 +41,17 @@ public class MainActivity extends AppCompatActivity {
         //Pero si manejo una activity no es mucho
 
         loadDollars(() -> {
-            setFragments(amountDolar, MainActivity.this::loadFragments);
+            createAndModifyDolarFragments(amountDolar, MainActivity.this::loadFragments);
         });
     }
 
-    private void setFragments(int amountDolar, Runnable onComplete) {
+    private void createAndModifyDolarFragments(int amountDolar, Runnable onComplete) {
         LinearLayout linearLayout = findViewById(R.id.containerFragments);
 
         //espero uqe el layout este listo..
         linearLayout.post(() -> {
-            int linearWidth = linearLayout.getWidth();
+            int newWidth = linearLayout.getWidth();//ancho en base al ancho del cel
             int linearHeight = linearLayout.getHeight();
-            int newWidth = linearWidth;//ancho en base al ancho del cel
             int newHeight = (linearHeight - ((margin * 2) * amountDolar)) / amountDolar;//margin * 2, margen arriba y abajo, y multiplico por la cantiadd de daolares
 //Y divido para que entren en la pantalla
 
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private void createFragment(LinearLayout linearLayout, int width, int height) {
         // creoun framelayout y configurosus param
         FrameLayout frameLayout = new FrameLayout(MainActivity.this);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);//padre linearlayout
         params.setMargins(0, margin, 0, margin); // Setear márgenes
         frameLayout.setLayoutParams(params);
         frameLayout.setId(View.generateViewId());//seteo id para la vista
@@ -78,10 +77,10 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.addView(frameLayout);//agrego los framelayout al linearlayout gral
 
         //instancio el fragmento y agrego al alista
-        ContainerDolarLayout fragment = ContainerDolarLayout.newInstance(width, height);
+        ContainerDolarFragment fragment = ContainerDolarFragment.newInstance(width, height);
         listFragments.add(fragment);
 
-        getSupportFragmentManager()
+        getSupportFragmentManager()//Seteo el fragment en el framelayout
                 .beginTransaction()
                 .replace(frameLayout.getId(), fragment)
                 .commitNow();//que los agregue sincronicos, es solo ui
@@ -116,10 +115,10 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < amountDolar; i++) {
             Dolar dolar = dolars.get(i); //llevo dolar actual
             if (dolar.getName().equals("Oficial")) {
-                dolarDB.insertDolarIfNotExists(dolar);
+                dolarDB.saveNewDate(dolar);
             }
             if (i < listFragments.size()) {
-                ContainerDolarLayout fragment = listFragments.get(i);//traigo el fragment por cada iteracion.. y seteo el dolar
+                ContainerDolarFragment fragment = listFragments.get(i);//traigo el fragment por cada iteracion.. y seteo el dolar
                 fragment.updateDolarData(dolar);
             }
         }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/rounded_background"
-    tools:context=".ui.fragments.ContainerDolarLayout">
+    tools:context=".ui.fragments.ContainerDolarFragment">
 
     <TextView
         android:id="@+id/date_name"
@@ -77,5 +77,6 @@
             android:layout_gravity="center"
             android:textAlignment="center"
             android:paddingTop="3dp"/>
+
     </LinearLayout>
 </FrameLayout>
