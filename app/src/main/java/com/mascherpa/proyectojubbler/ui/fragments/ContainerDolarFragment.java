@@ -60,37 +60,30 @@ public class ContainerDolarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_container_dolar_layout, container, false);
-
         FrameLayout frameLayout = view.findViewById(R.id.container_dolar);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(widthFrag, heightFrag);
         frameLayout.setLayoutParams(params);
         createSpinner(view);
-
         return view;
     }
 
     //traigo los dolares guardados en la db, leo sus fechas y guardo en la lista de la clase
     //creo el arrayadapter con lsa fechas parapoder setearlas
     public void createSpinner(View view) {
-
         Spinner spinner = view.findViewById(R.id.spinner_options);
-        // Obtener los datos de la base de datos en un hilo separado
+
         new Thread(() -> {
             List<Dolar> dolarsFromDb = dolarDB.getAllDolars();
             for (Dolar dolar : dolarsFromDb) {
-                //en base a los datos guardados, traigo las fechas y las guardo en la lista de fechas
                 listDateFromDb.add(dolar.getUpdateDate());
-
-                // Mostrar datos en el log
-//                Log.d("Dolar", "Nombre: " + dolar.getName() + ", Compra: " + dolar.getBuy() + ", Venta: " + dolar.getSell() + ", Fecha: " + dolar.getUpdateDate());
             }
-
-            //actualizo el adaptador en el hilo principal, paso el array al spinner
             getActivity().runOnUiThread(() -> {
-                //un ArrayAdapter usando la lista de opciones obtenidas
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, listDateFromDb);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
+                if (!listDateFromDb.isEmpty()) {
+                    spinner.setSelection(listDateFromDb.size() - 1);
+                }
             });
         }).start();
 
@@ -102,12 +95,10 @@ public class ContainerDolarFragment extends Fragment {
                     isSpinnerInitialized = true;
                     return;
                 }
-                String selectedOption = listDateFromDb.get(position);//guardo la string seleccionda
+                String selectedOption = listDateFromDb.get(position);
 
-                new Thread(() -> {//nuevo hilo para obtener los datos del dólar por fecha
-
-                    Dolar dolar = getDolarByDate(selectedOption);//busco el doalr que tenga esa fecha en la bd
-
+                new Thread(() -> {
+                    Dolar dolar = getDolarByDate(selectedOption);
                     getActivity().runOnUiThread(() -> {
                         if (dolar != null) {
                             updateDolarData(dolar);
@@ -125,12 +116,12 @@ public class ContainerDolarFragment extends Fragment {
         });
     }
 
+    //Consulta a la base de datos, la columna fecha pasandole la nueva fecha
     public Dolar getDolarByDate(String date) {
         Dolar dolar = null;
-        String query = "SELECT * FROM dolar_table WHERE fechaActualizacion = ?";//consult: desde mi dolar_table traeme el dato proximo, para evitar una inyex
-        SQLiteDatabase db = dolarDB.getReadableDatabase(); //traigo la instancia para leer la bd
-        Cursor cursor = db.rawQuery(query, new String[]{date});//cursor para iterar, mando la consulta y el parametro para la consulta
-        //lo paso como arreglo para en cuyo caso, reemplazen los ?
+        String query = "SELECT * FROM dolar_table WHERE updateDate = ?";
+        SQLiteDatabase db = dolarDB.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, new String[]{date});//para ser mas exacto
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -141,11 +132,11 @@ public class ContainerDolarFragment extends Fragment {
             }
             cursor.close();
         }
-
         db.close();
         return dolar; //retorno dolar
     }
 
+    //Set Info Dolar in TV
     public void updateDolarData(Dolar dolar) {
         TextView textViewDate = getView().findViewById(R.id.show_date);
         TextView textViewName = getView().findViewById(R.id.date_name);
@@ -153,13 +144,12 @@ public class ContainerDolarFragment extends Fragment {
         TextView textViewSell = getView().findViewById(R.id.date_sell);
 
         if (!dolar.getName().equals("Oficial")) {
-            Spinner spinner = getView().findViewById(R.id.spinner_options);
-            spinner.setVisibility(View.GONE);
             textViewDate.setVisibility(View.VISIBLE);
-            Log.d("Dolar",dolar.getUpdateDate());
-            textViewDate.setText("Actual.:"+dolar.getUpdateDate());
+            textViewDate.setText("Actual.:" + dolar.getUpdateDate());
+        } else {
+            Spinner spinner = getView().findViewById(R.id.spinner_options);
+            spinner.setVisibility(View.VISIBLE);
         }
-
         textViewName.setText(dolar.getName());
         textViewBuy.setText("$" + dolar.getBuy());
         textViewSell.setText("$" + dolar.getSell());

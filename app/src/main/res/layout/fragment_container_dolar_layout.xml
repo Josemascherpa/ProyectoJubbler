@@ -20,14 +20,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_gravity="center"> <!-- Centrar verticalmente los LinearLayouts -->
+        android:layout_gravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingHorizontal="10dp"
-            > <!-- Espaciado superior para separar del TextView -->
+            >
 
             <TextView
                 android:layout_width="0dp"
@@ -76,11 +76,12 @@
             android:background="@color/white"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:paddingTop="3dp"/>
+            android:paddingTop="3dp"
+            android:visibility="gone"/>
         <TextView
             android:id="@+id/show_date"
             android:layout_width="wrap_content"
-            android:layout_height="25dp"
+            android:layout_height="23dp"
             android:textColor="@color/white"
             android:layout_gravity="center"
             android:textAlignment="center"
