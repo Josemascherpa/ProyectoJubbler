@@ -77,6 +77,16 @@
             android:layout_gravity="center"
             android:textAlignment="center"
             android:paddingTop="3dp"/>
+        <TextView
+            android:id="@+id/show_date"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:visibility="gone">
+
+        </TextView>
 
     </LinearLayout>
 </FrameLayout>

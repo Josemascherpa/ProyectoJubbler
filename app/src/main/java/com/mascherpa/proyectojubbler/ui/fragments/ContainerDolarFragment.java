@@ -29,16 +29,14 @@ public class ContainerDolarFragment extends Fragment {
     private int widthFrag;
     private int heightFrag;
     DolarDatabase dolarDB;
-    List<String> listDateFromDb= new ArrayList<>();
+    List<String> listDateFromDb = new ArrayList<>();
     private boolean isSpinnerInitialized = false;
 
-
     public ContainerDolarFragment() {
-        //vacio paso parametros por bundle
+
     }
 
-
-    //para setear nuevas instancias y pasarlas por bundle..
+    //Creo unanueva instancia
     public static ContainerDolarFragment newInstance(int width, int height) {
         ContainerDolarFragment fragment = new ContainerDolarFragment();
         Bundle args = new Bundle();
@@ -61,25 +59,21 @@ public class ContainerDolarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // traigo el layout del fragment
         View view = inflater.inflate(R.layout.fragment_container_dolar_layout, container, false);
 
-        // traigo el container fragmento que voy a reutilizar
         FrameLayout frameLayout = view.findViewById(R.id.container_dolar);
-
-        //parametros que voy a pasarle.. faltarian los datos del dolar
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(widthFrag, heightFrag);
         frameLayout.setLayoutParams(params);
-
         createSpinner(view);
 
         return view;
     }
 
-    public void createSpinner( View view){
+    //traigo los dolares guardados en la db, leo sus fechas y guardo en la lista de la clase
+    //creo el arrayadapter con lsa fechas parapoder setearlas
+    public void createSpinner(View view) {
 
         Spinner spinner = view.findViewById(R.id.spinner_options);
-
         // Obtener los datos de la base de datos en un hilo separado
         new Thread(() -> {
             List<Dolar> dolarsFromDb = dolarDB.getAllDolars();
@@ -100,22 +94,20 @@ public class ContainerDolarFragment extends Fragment {
             });
         }).start();
 
-            //set evento configuracion al seleccionar una opcion
+        //set evento configuracion al seleccionar una opcion
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!isSpinnerInitialized) {//para que no se presione al comenzar, uso un bool para setearlo inicializado
+                if (!isSpinnerInitialized) {
                     isSpinnerInitialized = true;
                     return;
                 }
                 String selectedOption = listDateFromDb.get(position);//guardo la string seleccionda
 
-
                 new Thread(() -> {//nuevo hilo para obtener los datos del dólar por fecha
 
                     Dolar dolar = getDolarByDate(selectedOption);//busco el doalr que tenga esa fecha en la bd
 
-                    //actualizo el fragment en el hilo principal
                     getActivity().runOnUiThread(() -> {
                         if (dolar != null) {
                             updateDolarData(dolar);
@@ -134,7 +126,7 @@ public class ContainerDolarFragment extends Fragment {
     }
 
     public Dolar getDolarByDate(String date) {
-        Dolar dolar=null;
+        Dolar dolar = null;
         String query = "SELECT * FROM dolar_table WHERE fechaActualizacion = ?";//consult: desde mi dolar_table traeme el dato proximo, para evitar una inyex
         SQLiteDatabase db = dolarDB.getReadableDatabase(); //traigo la instancia para leer la bd
         Cursor cursor = db.rawQuery(query, new String[]{date});//cursor para iterar, mando la consulta y el parametro para la consulta
@@ -142,7 +134,6 @@ public class ContainerDolarFragment extends Fragment {
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                Log.d("Dolar","seteo");
                 String name = cursor.getString(0);
                 String buy = cursor.getString(1);
                 String sell = cursor.getString(2);
@@ -156,16 +147,22 @@ public class ContainerDolarFragment extends Fragment {
     }
 
     public void updateDolarData(Dolar dolar) {
-        if(!dolar.getName().equals("Oficial")){
-            Spinner spinner = getView().findViewById(R.id.spinner_options);
-            spinner.setVisibility(View.GONE);
-        }
+        TextView textViewDate = getView().findViewById(R.id.show_date);
         TextView textViewName = getView().findViewById(R.id.date_name);
         TextView textViewBuy = getView().findViewById(R.id.dale_buy);
         TextView textViewSell = getView().findViewById(R.id.date_sell);
+
+        if (!dolar.getName().equals("Oficial")) {
+            Spinner spinner = getView().findViewById(R.id.spinner_options);
+            spinner.setVisibility(View.GONE);
+            textViewDate.setVisibility(View.VISIBLE);
+            Log.d("Dolar",dolar.getUpdateDate());
+            textViewDate.setText("Actual.:"+dolar.getUpdateDate());
+        }
+
         textViewName.setText(dolar.getName());
-        textViewBuy.setText("$"+dolar.getBuy());
-        textViewSell.setText("$"+dolar.getSell());
+        textViewBuy.setText("$" + dolar.getBuy());
+        textViewSell.setText("$" + dolar.getSell());
     }
 
 }
