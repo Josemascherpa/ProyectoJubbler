@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,7 +32,7 @@ public class ContainerDolarFragment extends Fragment {
     DolarDatabase dolarDB;
     List<String> listDateFromDb = new ArrayList<>();
     private boolean isSpinnerInitialized = false;
-
+    ArrayAdapter<String> adapter;
     public ContainerDolarFragment() {
 
     }
@@ -78,7 +79,7 @@ public class ContainerDolarFragment extends Fragment {
                 listDateFromDb.add(dolar.getUpdateDate());
             }
             getActivity().runOnUiThread(() -> {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, listDateFromDb);
+                adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, listDateFromDb);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
                 if (!listDateFromDb.isEmpty()) {
@@ -149,6 +150,9 @@ public class ContainerDolarFragment extends Fragment {
         } else {
             Spinner spinner = getView().findViewById(R.id.spinner_options);
             spinner.setVisibility(View.VISIBLE);
+            if(adapter!=null){
+                adapter.notifyDataSetChanged();
+            }
         }
         textViewName.setText(dolar.getName());
         textViewBuy.setText("$" + dolar.getBuy());
