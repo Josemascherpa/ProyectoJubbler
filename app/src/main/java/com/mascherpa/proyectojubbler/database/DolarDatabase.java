@@ -43,9 +43,8 @@ public class DolarDatabase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertDolarIfNotExists(Dolar dolar) {
-        SQLiteDatabase db = this.getWritableDatabase();//para escribir bd
-        boolean inserted = false;
+    public void saveNewDate(Dolar dolar) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
         //mand oquery para ver si ya existe un registro con esa fecha
         Cursor cursor = db.query(TABLE_NAME, new String[]{COLUMN_UPDATE_DATE},
@@ -62,13 +61,12 @@ public class DolarDatabase extends SQLiteOpenHelper {
 
             Log.d("Dolar","no existe registro, lo agrego");
             db.insert(TABLE_NAME, null, values);
-            inserted = true;
+
         }else{
             Log.d("Dolar"," existe registro, no agrego");
         }
         cursor.close();
         db.close();
-        return inserted;
     }
 
     public List<Dolar> getAllDolars() {
