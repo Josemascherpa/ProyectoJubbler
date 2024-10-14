@@ -10,8 +10,8 @@ public class RetrofitClient {
     public static Retrofit getRetrofitInstance(){
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL) // Base URL de tu API
-                    .addConverterFactory(GsonConverterFactory.create()) //para manejar el json y pasarlo a mi response
+                    .baseUrl(BASE_URL) 
+                    .addConverterFactory(GsonConverterFactory.create()) //json - response
                     .build();
         }
         return retrofit;
