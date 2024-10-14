@@ -45,17 +45,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadDollars(() -> {
+            createAndModifyDolarFragments(amountDolar, MainActivity.this::loadFragments);
+        });
+    }
+
+    //Una vez qeu se crea el linearLayout gral, obtengo su tamaño y creo fragmentos
     private void createAndModifyDolarFragments(int amountDolar, Runnable onComplete) {
         LinearLayout linearLayout = findViewById(R.id.containerFragments);
 
-        //espero uqe el layout este listo..
         linearLayout.post(() -> {
-            int newWidth = linearLayout.getWidth();//ancho en base al ancho del cel
+            int newWidth = linearLayout.getWidth();
             int linearHeight = linearLayout.getHeight();
             int newHeight = (linearHeight - ((margin * 2) * amountDolar)) / amountDolar;//margin * 2, margen arriba y abajo, y multiplico por la cantiadd de daolares
 //Y divido para que entren en la pantalla
 
-            //creo cantidad de fragmentos por dolar
             for (int i = 0; i < amountDolar; i++) {
                 createFragment(linearLayout, newWidth, newHeight);
             }
@@ -66,17 +73,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Creo fragmento en base al linear padre, pasandole margin para separarlos
     private void createFragment(LinearLayout linearLayout, int width, int height) {
-        // creoun framelayout y configurosus param
+
         FrameLayout frameLayout = new FrameLayout(MainActivity.this);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);//padre linearlayout
-        params.setMargins(0, margin, 0, margin); // Setear márgenes
+        params.setMargins(0, margin, 0, margin);
         frameLayout.setLayoutParams(params);
-        frameLayout.setId(View.generateViewId());//seteo id para la vista
+        frameLayout.setId(View.generateViewId());
 
-        linearLayout.addView(frameLayout);//agrego los framelayout al linearlayout gral
+        linearLayout.addView(frameLayout);
 
-        //instancio el fragmento y agrego al alista
         ContainerDolarFragment fragment = ContainerDolarFragment.newInstance(width, height);
         listFragments.add(fragment);
 
@@ -86,10 +93,11 @@ public class MainActivity extends AppCompatActivity {
                 .commitNow();//que los agregue sincronicos, es solo ui
     }
 
+    //hago la llamada a la api con retrofit
     private void loadDollars(Runnable onComplete) {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class); //instancio apiservice
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class); //instancio
         Call<List<Dolar>> call = apiService.obtainDolars();
-        // llamada async :)
+        // async
         call.enqueue(new Callback<List<Dolar>>() {
             @Override
             public void onResponse(Call<List<Dolar>> call, Response<List<Dolar>> response) {
@@ -111,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //seteo fragmentos con la nueva data traida
     private void loadFragments() {
         for (int i = 0; i < amountDolar; i++) {
             Dolar dolar = dolars.get(i); //llevo dolar actual
@@ -118,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 dolarDB.saveNewDate(dolar);
             }
             if (i < listFragments.size()) {
-                ContainerDolarFragment fragment = listFragments.get(i);//traigo el fragment por cada iteracion.. y seteo el dolar
+                ContainerDolarFragment fragment = listFragments.get(i);
                 fragment.updateDolarData(dolar);
             }
         }

@@ -43,32 +43,27 @@ public class DolarDatabase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    //Guardo nueva fecha en caso de que no exista
     public void saveNewDate(Dolar dolar) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        //mand oquery para ver si ya existe un registro con esa fecha
         Cursor cursor = db.query(TABLE_NAME, new String[]{COLUMN_UPDATE_DATE},
                 COLUMN_UPDATE_DATE + " = ?", new String[]{dolar.getUpdateDate()},
                 null, null, null);
 
         if (cursor.getCount() == 0) {
-            //si no existe creo uno nuevo,ya que es una fecha distinta
             ContentValues values = new ContentValues();
             values.put(COLUMN_NAME, dolar.getName());
             values.put(COLUMN_BUY, dolar.getBuy());
             values.put(COLUMN_SELL, dolar.getSell());
             values.put(COLUMN_UPDATE_DATE, dolar.getUpdateDate());
-
-            Log.d("Dolar","no existe registro, lo agrego");
             db.insert(TABLE_NAME, null, values);
-
-        }else{
-            Log.d("Dolar"," existe registro, no agrego");
         }
         cursor.close();
         db.close();
     }
 
+    //Retorno lista de dolares guardados
     public List<Dolar> getAllDolars() {
         List<Dolar> dolars = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
